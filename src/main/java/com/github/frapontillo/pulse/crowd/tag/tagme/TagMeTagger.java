@@ -46,7 +46,7 @@ public class TagMeTagger extends IPlugin<Message, Message, TagMeTagger.TagMeConf
     }
 
     @Override protected Observable.Operator<Message, Message> getOperator(TagMeConfig parameters) {
-        return new ITaggerOperator(this) {
+        ITaggerOperator operator =  new ITaggerOperator(this) {
             @Override protected List<Tag> getTagsImpl(String text, String language) {
                 // get the tags
                 TagMeResponse response;
@@ -83,6 +83,8 @@ public class TagMeTagger extends IPlugin<Message, Message, TagMeTagger.TagMeConf
                 return tags;
             }
         };
+        operator.setConfig(parameters);
+        return operator;
     }
 
     private TagMeService getService() {
@@ -110,8 +112,10 @@ public class TagMeTagger extends IPlugin<Message, Message, TagMeTagger.TagMeConf
      *     }
      * </pre>
      */
-    public class TagMeConfig implements IPluginConfig<TagMeConfig> {
+    public class TagMeConfig implements IPluginConfig<TagMeConfig>, ITaggerOperator.GenericTaggerConfig {
         private Double minRho;
+
+        private String calculate;
 
         public Double getMinRho() {
             return minRho;
@@ -123,6 +127,16 @@ public class TagMeTagger extends IPlugin<Message, Message, TagMeTagger.TagMeConf
 
         @Override public TagMeConfig buildFromJsonElement(JsonElement jsonElement) {
             return PluginConfigHelper.buildFromJson(jsonElement, TagMeConfig.class);
+        }
+
+        @Override
+        public String getCalculate() {
+            return calculate;
+        }
+
+        @Override
+        public String setCalculate() {
+            return calculate;
         }
     }
 }
